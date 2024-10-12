@@ -31,7 +31,8 @@ while (string.IsNullOrWhiteSpace(appSettings.ApiKey) || string.IsNullOrEmpty(app
 var steamInterfaceFactory = new SteamWebInterfaceFactory(appSettings.ApiKey);
 var steamApps = steamInterfaceFactory.CreateSteamWebInterface<SteamApps>(new HttpClient()); 
 var appListResponse = await steamApps.GetAppListAsync();
-var appCache = appListResponse.Data.ToDictionary(app => app.AppId, app => app.Name);
+var uniqueAppList = appListResponse.Data.DistinctBy(app => app.AppId).ToList();
+var appCache = uniqueAppList.ToDictionary(app => app.AppId, app => app.Name);
 
 #region funcs
 async Task<string?> GetGameNameFromSteamApiTask(int appId)
@@ -121,4 +122,4 @@ Console.WriteLine($"Total screenshots found: {totalScreenshots}");
 Console.WriteLine($"Screenshots moved to unknown game folder: {unknownAppIdScreenshots}");
 Console.WriteLine("--------------------------------------------------");
 await Task.Delay(100);
-Environment.Exit(0);
+// Environment.Exit(0);
